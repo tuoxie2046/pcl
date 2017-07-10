@@ -388,7 +388,7 @@ struct ImageView
     int cols;
     view_device_.download (view_host_, cols);
     if (viz_)
-        viewerScene_->showRGBImage (reinterpret_cast<unsigned char*> (&view_host_[0]), view_device_.cols (), view_device_.rows ());    
+        viewerScene_->showRGBImage (reinterpret_cast<unsigned char*> (&view_host_[0]), view_device_.cols (), view_device_.rows (), "rgb_image");    
 
     //viewerColor_.showRGBImage ((unsigned char*)&rgb24.data, rgb24.cols, rgb24.rows);
 
@@ -406,7 +406,7 @@ struct ImageView
   showDepth (const PtrStepSz<const unsigned short>& depth) 
   { 
      if (viz_)
-       viewerDepth_->showShortImage (depth.data, depth.cols, depth.rows, 0, 5000, true); 
+       viewerDepth_->showShortImage (depth.data, depth.cols, depth.rows, 0, 5000, true, "short_image"); 
   }
   
   void
@@ -420,7 +420,7 @@ struct ImageView
     generated_depth_.download(data, c);
 
     if (viz_)
-        viewerDepth_->showShortImage (&data[0], generated_depth_.cols(), generated_depth_.rows(), 0, 5000, true);
+        viewerDepth_->showShortImage (&data[0], generated_depth_.cols(), generated_depth_.rows(), 0, 5000, true, "short_image");
   }
 
   void
@@ -819,7 +819,7 @@ struct KinFuApp
         scene_cloud_view_.showMesh(kinfu_, integrate_colors_);
     }
      
-    if (has_image)
+    if (viz_ && has_image)
     {
       Eigen::Affine3f viewer_pose = getViewerPose(*scene_cloud_view_.cloud_viewer_);
       image_view_.showScene (kinfu_, rgb24, registration_, independent_camera_ ? &viewer_pose : 0);
@@ -828,7 +828,7 @@ struct KinFuApp
     if (current_frame_cloud_view_)
       current_frame_cloud_view_->show (kinfu_);    
       
-    if (!independent_camera_)
+    if (viz_ && !independent_camera_)
       setViewerPose (*scene_cloud_view_.cloud_viewer_, kinfu_.getCameraPose());
   }
   

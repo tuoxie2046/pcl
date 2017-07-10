@@ -44,6 +44,7 @@
 
 #include <pcl/recognition/point_types.h>
 #include <pcl/recognition/dot_modality.h>
+#include <pcl/recognition/point_types.h>
 #include <pcl/recognition/quantized_map.h>
 
 namespace pcl

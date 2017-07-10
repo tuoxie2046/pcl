@@ -1417,18 +1417,18 @@ pcl::LINEMOD::detectTemplatesSemiScaleInvariant (
       }
     }
     // Free thread local storage
-    #if defined(__AVX2__) || defined(__SSE2__)
+#if defined(__AVX2__) || defined(__SSE2__)
       aligned_free (score_sums);
       aligned_free (tmp_score_sums);
-    #else
+#else
       delete[] score_sums;
-    #endif
+#endif
 
-    #ifdef LINEMOD_USE_SEPARATE_ENERGY_MAPS
+#ifdef LINEMOD_USE_SEPARATE_ENERGY_MAPS
       delete[] score_sums_1;
       delete[] score_sums_2;
       delete[] score_sums_3;
-    #endif
+#endif
   } // #pragma omp parallel
 
   printf("3 %f\n", 1000.0*(getTickCount()-start)/1e9);

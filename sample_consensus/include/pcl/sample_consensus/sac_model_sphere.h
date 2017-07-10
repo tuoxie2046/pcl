@@ -82,6 +82,8 @@ namespace pcl
         : SampleConsensusModel<PointT> (cloud, random), tmp_inliers_ ()
       {
         model_name_ = "SampleConsensusModelSphere";
+        sample_size_ = 4;
+        model_size_ = 4;
       }
 
       /** \brief Constructor for base SampleConsensusModelSphere.
@@ -95,6 +97,8 @@ namespace pcl
         : SampleConsensusModel<PointT> (cloud, indices, random), tmp_inliers_ ()
       {
         model_name_ = "SampleConsensusModelSphere";
+        sample_size_ = 4;
+        model_size_ = 4;
       }
       
       /** \brief Empty destructor */
@@ -197,18 +201,17 @@ namespace pcl
       inline pcl::SacModel getModelType () const { return (SACMODEL_SPHERE); }
 
     protected:
+      using SampleConsensusModel<PointT>::sample_size_;
+      using SampleConsensusModel<PointT>::model_size_;
+
       /** \brief Check whether a model is valid given the user constraints.
         * \param[in] model_coefficients the set of model coefficients
         */
-      inline bool 
+      virtual bool
       isModelValid (const Eigen::VectorXf &model_coefficients)
       {
-        // Needs a valid model coefficients
-        if (model_coefficients.size () != 4)
-        {
-          PCL_ERROR ("[pcl::SampleConsensusModelSphere::isModelValid] Invalid number of model coefficients given (%lu)!\n", model_coefficients.size ());
+        if (!SampleConsensusModel<PointT>::isModelValid (model_coefficients))
           return (false);
-        }
 
         if (radius_min_ != -std::numeric_limits<double>::max() && model_coefficients[3] < radius_min_)
           return (false);
@@ -260,7 +263,7 @@ namespace pcl
             cen_t[2] = model_->input_->points[(*model_->tmp_inliers_)[i]].z - x[2];
             
             // g = sqrt ((x-a)^2 + (y-b)^2 + (z-c)^2) - R
-            fvec[i] = sqrtf (cen_t.dot (cen_t)) - x[3];
+            fvec[i] = std::sqrt (cen_t.dot (cen_t)) - x[3];
           }
           return (0);
         }

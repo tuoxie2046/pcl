@@ -45,6 +45,7 @@
 
 namespace pcl
 {
+
   struct EIGEN_ALIGN16 GradientXY
   {
     union
@@ -70,6 +71,7 @@ namespace pcl
     os << "(" << p.x << "," << p.y << " - " << p.magnitude << ")";
     return (os);
   }
+
   /** \brief A point structure representing Euclidean xyz coordinates, and the intensity value.
     * \ingroup common
     */

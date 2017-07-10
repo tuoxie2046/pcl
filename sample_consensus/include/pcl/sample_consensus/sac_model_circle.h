@@ -81,6 +81,8 @@ namespace pcl
         : SampleConsensusModel<PointT> (cloud, random), tmp_inliers_ () 
       {
         model_name_ = "SampleConsensusModelCircle2D";
+        sample_size_ = 3;
+        model_size_ = 3;
       }
 
       /** \brief Constructor for base SampleConsensusModelCircle2D.
@@ -94,6 +96,8 @@ namespace pcl
         : SampleConsensusModel<PointT> (cloud, indices, random), tmp_inliers_ ()
       {
         model_name_ = "SampleConsensusModelCircle2D";
+        sample_size_ = 3;
+        model_size_ = 3;
       }
 
       /** \brief Copy constructor.
@@ -195,10 +199,13 @@ namespace pcl
       getModelType () const { return (SACMODEL_CIRCLE2D); }
 
     protected:
+      using SampleConsensusModel<PointT>::sample_size_;
+      using SampleConsensusModel<PointT>::model_size_;
+
       /** \brief Check whether a model is valid given the user constraints.
         * \param[in] model_coefficients the set of model coefficients
         */
-      bool 
+      virtual bool
       isModelValid (const Eigen::VectorXf &model_coefficients);
 
       /** \brief Check if a sample of indices results in a good sample of points indices.
@@ -240,7 +247,7 @@ namespace pcl
             float yt = model_->input_->points[(*model_->tmp_inliers_)[i]].y - x[1];
             
             // g = sqrt ((x-a)^2 + (y-b)^2) - R
-            fvec[i] = sqrtf (xt * xt + yt * yt) - x[2];
+            fvec[i] = std::sqrt (xt * xt + yt * yt) - x[2];
           }
           return (0);
         }

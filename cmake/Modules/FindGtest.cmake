@@ -4,7 +4,7 @@
 # This sets the following variables:
 # GTEST_FOUND - True if GTest was found.
 # GTEST_INCLUDE_DIRS - Directories containing the GTest include files.
-# GTEST_SRC - Directories containing the GTest source files.
+# GTEST_SRC_DIR - Directories containing the GTest source files.
 
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} /usr /usr/local)
@@ -24,6 +24,7 @@ find_path(GTEST_SRC_DIR src/gtest-all.cc
     HINTS "${GTEST_ROOT}" "$ENV{GTEST_ROOT}"
     PATHS "$ENV{PROGRAMFILES}/gtest" "$ENV{PROGRAMW6432}/gtest"
     PATHS "$ENV{PROGRAMFILES}/gtest-1.7.0" "$ENV{PROGRAMW6432}/gtest-1.7.0"
+    PATH /usr/src/googletest/googletest
     PATH /usr/src/gtest
     PATH_SUFFIXES gtest usr/src/gtest)
 

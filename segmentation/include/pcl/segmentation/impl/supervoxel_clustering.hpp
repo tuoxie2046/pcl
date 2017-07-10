@@ -44,18 +44,32 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template <typename PointT>
-pcl::SupervoxelClustering<PointT>::SupervoxelClustering (float voxel_resolution, float seed_resolution, bool use_single_camera_transform) :
+pcl::SupervoxelClustering<PointT>::SupervoxelClustering (float voxel_resolution, float seed_resolution) :
   resolution_ (voxel_resolution),
   seed_resolution_ (seed_resolution),
   adjacency_octree_ (),
   voxel_centroid_cloud_ (),
   color_importance_ (0.1f),
   spatial_importance_ (0.4f),
-  normal_importance_ (1.0f)
+  normal_importance_ (1.0f),
+  use_default_transform_behaviour_ (true)
 {
   adjacency_octree_.reset (new OctreeAdjacencyT (resolution_));
-  if (use_single_camera_transform)
-    adjacency_octree_->setTransformFunction (boost::bind (&SupervoxelClustering::transformFunction, this, _1));  
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <typename PointT>
+pcl::SupervoxelClustering<PointT>::SupervoxelClustering (float voxel_resolution, float seed_resolution, bool) :
+  resolution_ (voxel_resolution),
+  seed_resolution_ (seed_resolution),
+  adjacency_octree_ (),
+  voxel_centroid_cloud_ (),
+  color_importance_ (0.1f),
+  spatial_importance_ (0.4f),
+  normal_importance_ (1.0f),
+  use_default_transform_behaviour_ (true)
+{
+  adjacency_octree_.reset (new OctreeAdjacencyT (resolution_));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -188,6 +202,10 @@ pcl::SupervoxelClustering<PointT>::prepareForSegmentation ()
   //Add the new cloud of data to the octree
   //std::cout << "Populating adjacency octree with new cloud \n";
   //double prep_start = timer_.getTime ();
+  if ( (use_default_transform_behaviour_ && input_->isOrganized ())
+       || (!use_default_transform_behaviour_ && use_single_camera_transform_))
+      adjacency_octree_->setTransformFunction (boost::bind (&SupervoxelClustering::transformFunction, this, _1));
+
   adjacency_octree_->addPointsFromInputCloud ();
   //double prep_end = timer_.getTime ();
   //std::cout<<"Time elapsed populating octree with next frame ="<<prep_end-prep_start<<" ms\n";
@@ -230,13 +248,13 @@ pcl::SupervoxelClustering<PointT>::computeVoxelData ()
       if ( !pcl::isFinite<PointT> (*input_itr))
         continue;
       //Otherwise look up its leaf container
-        LeafContainerT* leaf = adjacency_octree_->getLeafContainerAtPoint (*input_itr);
-        
-        //Get the voxel data object
-        VoxelData& voxel_data = leaf->getData ();
-        //Add this normal in (we will normalize at the end)
-        voxel_data.normal_ += normal_itr->getNormalVector4fMap ();
-        voxel_data.curvature_ += normal_itr->curvature;
+      LeafContainerT* leaf = adjacency_octree_->getLeafContainerAtPoint (*input_itr);
+
+      //Get the voxel data object
+      VoxelData& voxel_data = leaf->getData ();
+      //Add this normal in (we will normalize at the end)
+      voxel_data.normal_ += normal_itr->getNormalVector4fMap ();
+      voxel_data.curvature_ += normal_itr->curvature;
     }
     //Now iterate through the leaves and normalize 
     for (leaf_itr = adjacency_octree_->begin (); leaf_itr != adjacency_octree_->end (); ++leaf_itr)
@@ -397,8 +415,8 @@ pcl::SupervoxelClustering<PointT>::selectInitialSupervoxelSeeds (std::vector<int
   std::vector<float> sqr_distances;
   seed_indices.reserve (seed_indices_orig.size ());
   float search_radius = 0.5f*seed_resolution_;
-  // This is number of voxels which fit in a planar slice through search volume
-  // Area of planar slice / area of voxel side
+  // This is 1/20th of the number of voxels which fit in a planar slice through search volume
+  // Area of planar slice / area of voxel side. (Note: This is smaller than the value mentioned in the original paper)
   float min_points = 0.05f * (search_radius)*(search_radius) * 3.1415926536f  / (resolution_*resolution_);
   for (size_t i = 0; i < seed_indices_orig.size (); ++i)
   {
@@ -640,7 +658,7 @@ pcl::SupervoxelClustering<PointT>::setVoxelResolution (float resolution)
 template <typename PointT> float
 pcl::SupervoxelClustering<PointT>::getSeedResolution () const
 {
-  return (resolution_);
+  return (seed_resolution_);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -670,6 +688,14 @@ template <typename PointT> void
 pcl::SupervoxelClustering<PointT>::setNormalImportance (float val)
 {
   normal_importance_ = val;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <typename PointT> void
+pcl::SupervoxelClustering<PointT>::setUseSingleCameraTransform (bool val)
+{
+  use_default_transform_behaviour_ = false;
+  use_single_camera_transform_ = val;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

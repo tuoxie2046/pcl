@@ -262,6 +262,7 @@ macro(find_openni2)
   endif(OPENNI2_FOUND)
 endmacro(find_openni2)
 
+<<<<<<< HEAD
 #remove this as soon as the Ensenso SDK is shipped with FindEnsenso.cmake
 macro(find_ensenso)
   if(PCL_FIND_QUIETLY)
@@ -413,6 +414,8 @@ macro(find_rssdk)
   endif()
 endmacro(find_rssdk)
 
+=======
+>>>>>>> origin/master
 #remove this as soon as flann is shipped with FindFlann.cmake
 macro(find_flann)
   if(PCL_ALL_IN_ONE_INSTALLER)
@@ -619,14 +622,6 @@ macro(find_external_library _component _lib _is_optional)
     find_openni()
   elseif("${_lib}" STREQUAL "openni2")
     find_openni2()
-  elseif("${_lib}" STREQUAL "ensenso")
-    find_ensenso()
-  elseif("${_lib}" STREQUAL "davidSDK")
-    find_davidSDK()
-  elseif("${_lib}" STREQUAL "dssdk")
-    find_dssdk()
-  elseif("${_lib}" STREQUAL "rssdk")
-    find_rssdk()
   elseif("${_lib}" STREQUAL "vtk")
     find_VTK()
   elseif("${_lib}" STREQUAL "libusb-1.0")
@@ -906,7 +901,11 @@ endif(NOT "${PCL_DEFINITIONS}" STREQUAL "")
 pcl_remove_duplicate_libraries(PCL_LIBRARIES PCL_DEDUP_LIBRARIES)
 set(PCL_LIBRARIES ${PCL_DEDUP_LIBRARIES})
 # Add 3rd party libraries, as user code might include our .HPP implementations
+<<<<<<< HEAD
 list(APPEND PCL_LIBRARIES ${BOOST_LIBRARIES} ${QHULL_LIBRARIES} ${OPENNI_LIBRARIES} ${OPENNI2_LIBRARIES} ${ENSENSO_LIBRARIES} ${davidSDK_LIBRARIES} ${DSSDK_LIBRARIES} ${RSSDK_LIBRARIES} ${FLANN_LIBRARIES} ${VTK_LIBRARIES})
+=======
+list(APPEND PCL_LIBRARIES ${BOOST_LIBRARIES} ${QHULL_LIBRARIES} ${OPENNI_LIBRARIES} ${OPENNI2_LIBRARIES} ${FLANN_LIBRARIES} ${VTK_LIBRARIES})
+>>>>>>> origin/master
 
 find_package_handle_standard_args(PCL DEFAULT_MSG PCL_LIBRARIES PCL_INCLUDE_DIRS)
 mark_as_advanced(PCL_LIBRARIES PCL_INCLUDE_DIRS PCL_LIBRARY_DIRS)
